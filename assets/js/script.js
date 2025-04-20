@@ -2,55 +2,76 @@
 
 function markingPoints() {
     const main = document.querySelector(".main");
-    main.style.pointerEvents = "none"; // Disable interactions with the drawing area
+    main.style.pointerEvents = "none";
 
-    let isMouseDown = false;
-    let mouseX = 0;
-    let mouseY = 0;
+    let isDrawing = false;
+    let posX = 0;
+    let posY = 0;
     let lastX = null;
     let lastY = null;
 
-    // Track mouse position & mouse down/up events
-    document.addEventListener("mousedown", e => e.button === 0 && (isMouseDown = true)); // Left mouse down
-    document.addEventListener("mouseup", e => e.button === 0 && (isMouseDown = false)); // Left mouse up
-    document.addEventListener("mousemove", e => {
-        mouseX = e.clientX; // Get mouse X position
-        mouseY = e.clientY; // Get mouse Y position
-    });
-
-    // Function to add a point (dot)
+    // Function to add point
     function addPoint(x, y) {
         const point = document.createElement("div");
-        point.className = "point absolute w-2 h-2 rounded-full bg-white"; // Style the point (dot)
-        point.style.left = `${x}px`; // X position
-        point.style.top = `${y}px`; // Y position
-        point.style.opacity = "1"; // No fade, make the point instantly visible
-
-        main.appendChild(point); // Add point to the main container
+        point.className = "point absolute w-2 h-2 rounded-full bg-white";
+        point.style.left = `${x}px`;
+        point.style.top = `${y}px`;
+        point.style.opacity = "1";
+        main.appendChild(point);
     }
 
-    // Fast point placement loop to ensure drawing at maximum speed
+    // Drawer loop for speed
     function drawerLoop() {
-        if (isMouseDown) {
-            if (lastX !== null && lastY !== null) {
-                // Place multiple points per frame to create a smooth drawing effect
-                addPoint(lastX, lastY);
-            }
+        if (isDrawing && lastX !== null && lastY !== null) {
+            addPoint(lastX, lastY);
         }
-        setTimeout(() => drawerLoop(), 0); // Run the loop at maximum speed, as fast as possible
+        setTimeout(drawerLoop, 0);
     }
 
-    // Update last position when the mouse is down
-    document.addEventListener("mousemove", () => {
-        if (isMouseDown) {
-            lastX = mouseX; // Update last X position
-            lastY = mouseY; // Update last Y position
+    // Mouse events
+    document.addEventListener("mousedown", (e) => {
+        if (e.button === 0) isDrawing = true;
+    });
+
+    document.addEventListener("mouseup", () => {
+        isDrawing = false;
+    });
+
+    document.addEventListener("mousemove", (e) => {
+        posX = e.clientX;
+        posY = e.clientY;
+        if (isDrawing) {
+            lastX = posX;
+            lastY = posY;
         }
     });
 
-    // Start drawing loop
-    drawerLoop();
+    // Touch events (for mobile)
+    document.addEventListener("touchstart", (e) => {
+        isDrawing = true;
+        const touch = e.touches[0];
+        lastX = touch.clientX;
+        lastY = touch.clientY;
+    }, { passive: false });
+
+    document.addEventListener("touchend", () => {
+        isDrawing = false;
+    });
+
+    document.addEventListener("touchmove", (e) => {
+        e.preventDefault(); // Prevents scrolling while drawing
+        const touch = e.touches[0];
+        posX = touch.clientX;
+        posY = touch.clientY;
+        if (isDrawing) {
+            lastX = posX;
+            lastY = posY;
+        }
+    }, { passive: false });
+
+    drawerLoop(); // Start loop
 }
+
 
 function deleteBtn() {
     document.querySelector(".del")
