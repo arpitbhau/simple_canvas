@@ -1,8 +1,6 @@
 // Jai Shree Ram 🚩
 
-
 function markingPoints() {
-
     const main = document.querySelector(".main");
     main.style.pointerEvents = "none"; // Disable interactions with the drawing area
 
@@ -52,22 +50,18 @@ function markingPoints() {
 
     // Start drawing loop
     drawerLoop();
-
-
 }
 
 function deleteBtn() {
     document.querySelector(".del")
-    .addEventListener("click" , () => {
-        document.querySelector(".main").innerHTML = ``
-    })
+        .addEventListener("click", () => {
+            document.querySelector(".main").innerHTML = ``
+        })
 }
-
-
 
 function main() {
-    markingPoints()
-    deleteBtn()
+    markingPoints();
+    deleteBtn();
 }
 
-main()
+main();
